@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth.models import User
-from .models import ConfirmationCode
+#from .models import ConfirmationCode
 from django.contrib.auth import authenticate
 from users.models import CustomUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from . import utils
 
 
 class UserAuthSerializer(serializers.Serializer):
@@ -59,13 +60,8 @@ class ConfirmUserSerializer(serializers.Serializer):
         except CustomUser.DoesNotExist:
             raise serializers.ValidationError("Пользователь не найден")
 
-        try:
-            confirmation = ConfirmationCode.objects.get(user=user)
-        except ConfirmationCode.DoesNotExist:
-            raise serializers.ValidationError("Код подтверждения не найден")
-
-        if confirmation.code != code:
-            raise serializers.ValidationError("Неверный код")
+        if not utils.verify_confirmation_code(email, code):
+            raise serializers.ValidationError("Неверный код подтверждения")
 
         attrs['user'] = user
         return attrs

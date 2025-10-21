@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from .serializers import UserCreateSerializer, UserAuthSerializer, ConfirmUserSerializer
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
-from .models import ConfirmationCode, CustomUser
+from .models import  CustomUser
 from rest_framework.views import APIView
 import random
 from rest_framework.generics import CreateAPIView
@@ -13,6 +13,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework_simplejwt.views import TokenObtainPairView
 from users.serializers import CustomTokenObtainPairSerializer
+from . import utils
 
 
 
@@ -50,8 +51,9 @@ class RegistrationAPIView(APIView):
 
         user = CustomUser.objects.create_user(email=email, password=password, birthdate=birthdate, is_active=False)
 
-        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-        ConfirmationCode.objects.create(user=user, code=code)
+        code = utils.generate_confirmation_code()
+        utils.save_code_to_cache(user.email, code)
+        print("Code generated and saved to cache.")
 
         print(f'Код подтверждения для пользователя {email}: {code}')  # Для отладки
 

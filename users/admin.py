@@ -1,5 +1,5 @@
 from django.contrib import admin
-from users.models import CustomUser, ConfirmationCode
+from users.models import CustomUser
 from django.contrib.auth.admin import UserAdmin
 
 @admin.register(CustomUser)
@@ -12,4 +12,4 @@ class CustomUserAdmin(UserAdmin):
     )
 
 
-admin.site.register(ConfirmationCode)
+#admin.site.register(ConfirmationCode)
